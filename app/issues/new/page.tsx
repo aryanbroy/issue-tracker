@@ -5,16 +5,29 @@ import { Controller, useForm } from 'react-hook-form';
 import SimpleMDE from 'react-simplemde-editor';
 import 'easymde/dist/easymde.min.css';
 import React from 'react';
+import axios from 'axios';
+import { useRouter } from 'next/navigation';
 
-interface IssuesForm {
+type IssuesForm = {
   title: string;
   description: string;
-}
+};
 
 const NewIssuePage = () => {
-  const { register, control, handleSubmit } = useForm();
+  const { register, control, handleSubmit } = useForm<IssuesForm>();
+  const router = useRouter();
   return (
-    <form onSubmit={handleSubmit((data) => console.log(data))} className="max-w-xl space-y-3">
+    <form
+      onSubmit={handleSubmit(async (data) => {
+        try {
+          await axios.post('/api/issues', data);
+          router.push('/issues');
+        } catch (error) {
+          console.log(error);
+        }
+      })}
+      className="max-w-xl space-y-3"
+    >
       <TextField.Root placeholder="Title" size="2" {...register('title')} />
       <Controller
         name="description"
